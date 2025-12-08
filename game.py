@@ -8,6 +8,7 @@ HEIGHT = 600
 GREEN = (0,255,0)
 WHITE = (253,245,230)
 RED = (255,0,0)
+YELLOW = (255,255,0)
 
 #遊戲初始化,遊戲視窗
 pygame.init()
@@ -34,7 +35,11 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
-            self.rect.left = 0    
+            self.rect.left = 0 
+
+    def shoot(self):    
+        bullet = Bullet(self.rect.centerx,self.rect.top)
+        all_sprites.add(bullet)    
 
 class Rock(pygame.sprite.Sprite):
     def __init__(self):
@@ -55,6 +60,21 @@ class Rock(pygame.sprite.Sprite):
             self.speedy = random.randrange(2, 10)
             self.speedx = random.randrange(-3, 3)
 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self,x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((10,20))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect() #定位物件
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.speedy = -10
+        
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.bottom < 0:
+            self.kill()
+
 all_sprites = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
@@ -69,6 +89,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()    
     #更新遊戲
 
     all_sprites.update()
